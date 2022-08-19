@@ -18,6 +18,8 @@ namespace Blog.Domain.Entities
         public DateTime? UpdateDate { get; set; }
         public DateTime? PublishDate { get; set; }
         public int PublishingStatus { get; set; }
+        public string RejectComment { get; set; }
+
         public virtual IEnumerable<BlogPostComment> BlogPostComments { get; set; }
     }
 }

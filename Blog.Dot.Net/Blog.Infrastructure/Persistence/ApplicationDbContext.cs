@@ -17,11 +17,11 @@ namespace Blog.Infrastructure.Persistence
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            base.OnModelCreating(builder);
+
             builder.Entity<BlogPost>().ToTable("BlogPost");
 
             builder.Entity<BlogPostComment>().ToTable("BlogPostComment");
-
-            base.OnModelCreating(builder);
         }
     }
 }

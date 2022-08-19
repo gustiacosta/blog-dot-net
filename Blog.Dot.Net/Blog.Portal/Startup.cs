@@ -44,9 +44,7 @@ namespace Blog.Portal
 
             services.AddControllersWithViews();
 
-            services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));
-
-            services.AddTransient<IDateTime, DateTimeService>();
+            services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

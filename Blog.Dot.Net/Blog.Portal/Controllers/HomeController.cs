@@ -3,6 +3,7 @@ using Blog.Application.Interfaces;
 using Blog.Application.Models;
 using Blog.Domain.Entities;
 using Blog.Portal.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Linq;
 
 namespace Blog.Portal.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
         private readonly IMapper _mapper;
@@ -28,7 +30,7 @@ namespace Blog.Portal.Controllers
         {
             var data = _repositoryService
                 .Get<BlogPost>(
-                        c => c.PublishingStatus == (int)Domain.Enums.PostPublishingStatus.Approved,
+                        c => c.PublishingStatus == (int)Domain.Enums.PostPublishingStatus.Published,
                         c => c.OrderByDescending(c => c.PublishDate), null, null,
                         inc => inc.BlogPostComments)
                 .ToList();
