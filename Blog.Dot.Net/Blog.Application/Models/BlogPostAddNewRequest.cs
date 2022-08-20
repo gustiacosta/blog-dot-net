@@ -3,12 +3,10 @@
 namespace Blog.Application.Models
 {
     /// <summary>
-    /// Used for adding or updating posts
+    /// Used for adding posts
     /// </summary>
-    public class BlogPostRequest
+    public class BlogPostAddNewRequest
     {
-        public int BlogPostId { get; set; } //required only when updating
-
         [Required]
         public string Title { get; set; }
 

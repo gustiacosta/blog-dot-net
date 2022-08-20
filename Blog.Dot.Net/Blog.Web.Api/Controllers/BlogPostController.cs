@@ -48,7 +48,7 @@ namespace Blog.Web.Api.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<RequestResponse>> Get()
         {
             try
@@ -77,46 +77,16 @@ namespace Blog.Web.Api.Controllers
             });
         }
 
-        [Authorize(Roles = "Editor")]
-        [HttpGet]
-        [Route("{status}", Name = "GetByStatus")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<RequestResponse>> GetByStatus(int status)
-        {
-            try
-            {
-                var data = await _repositoryService.GetAsync<BlogPost>(
-                            c => c.PublishingStatus == status,
-                            c => c.OrderByDescending(c => c.CreateDate),
-                            null, null, inc => inc.BlogPostComments);
-
-                var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
-
-                return Ok(new RequestResponse
-                {
-                    IsSuccess = true,
-                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.ToString());
-            }
-
-            return BadRequest(new RequestResponse
-            {
-                Message = "Error retrieving blog posts"
-            });
-        }
-
+        /// <summary>
+        /// Add a comment to a published post (any role)
+        /// </summary>
+        /// <returns></returns>
         [Authorize(Roles = "Public,Writer,Editor")]
         [HttpPost]
         [Route("addcomment")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<RequestResponse>> AddComment([FromBody] BlogPostAddCommentRequest model)
         {
             if (ModelState.IsValid)

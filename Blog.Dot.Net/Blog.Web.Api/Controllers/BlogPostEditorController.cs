@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Blog.Web.Api.Controllers
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Editor")]
+    [Authorize(Roles = "Editor")]
     [ApiController]
     [Route("api/[controller]")]
     public class BlogPostEditorController : ControllerBase
@@ -40,10 +40,14 @@ namespace Blog.Web.Api.Controllers
             _repositoryService = repositoryService;
         }
 
+        /// <summary>
+        /// Get all posts in pending approval status
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<RequestResponse>> Get()
         {
             try
@@ -74,7 +78,51 @@ namespace Blog.Web.Api.Controllers
         }
 
         /// <summary>
-        /// Updates a post to status: approved/rejected
+        /// Get posts by status. Current options: 
+        /// PendingApproval = 1,
+        /// Published = 2,
+        /// Rejected = 3
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{status}", Name = "GetByStatus")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<RequestResponse>> GetByStatus(int status)
+        {
+            try
+            {
+                var data = await _repositoryService.GetAsync<BlogPost>(
+                            c => c.PublishingStatus == status,
+                            c => c.OrderByDescending(c => c.CreateDate),
+                            null, null, inc => inc.BlogPostComments);
+
+                var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
+
+                return Ok(new RequestResponse
+                {
+                    IsSuccess = true,
+                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
+
+            return BadRequest(new RequestResponse
+            {
+                Message = "Error retrieving blog posts"
+            });
+        }
+
+        /// <summary>
+        /// Updates a post to: approved/rejected status.
+        /// Options to send: 
+        /// Published = 2,
+        /// Rejected = 3
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>        
@@ -82,7 +130,7 @@ namespace Blog.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<ActionResult<RequestResponse>> Update([FromBody] BlogPostEditorRequest model)
         {
             if (ModelState.IsValid)

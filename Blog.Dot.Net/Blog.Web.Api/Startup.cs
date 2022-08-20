@@ -6,6 +6,7 @@ using Blog.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Blog.Web.Api
@@ -48,6 +52,7 @@ namespace Blog.Web.Api
 
             services.AddScoped<ITokenService, JwtTokenService>();
 
+            bool isDevelopment = true;
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -60,6 +65,27 @@ namespace Blog.Web.Api
                     ValidAudience = Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
                 };
+
+                options.Events = new JwtBearerEvents()
+                {
+                    OnTokenValidated = v =>
+                    {
+                        return System.Threading.Tasks.Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = v =>
+                    {
+                        v.NoResult();
+                        v.Response.StatusCode = 500;
+                        v.Response.ContentType = "text/plain";
+
+                        if (isDevelopment)
+                        {
+                            return v.Response.WriteAsync(v.Exception.ToString());
+                        }
+
+                        return v.Response.WriteAsync("An error occured processing your authentication.");
+                    }
+                };
             });
 
             services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));
@@ -67,7 +93,34 @@ namespace Blog.Web.Api
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Blog Engine Web Api", Version = "v1" });
+
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "JWT Authorization header using the Bearer scheme.",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = JwtBearerDefaults.AuthenticationScheme
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement{
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = JwtBearerDefaults.AuthenticationScheme //The name of the previously defined security scheme.                                
+                            }
+                        },new List<string>()
+                    }
+                });
+
+                var xmlFile = "apidocumentation.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
             });
+
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -83,6 +136,13 @@ namespace Blog.Web.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
+            });
 
             app.UseAuthorization();
 

@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Blog.Web.Api</name>
+    </assembly>
+    <members>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostController.Get">
+            <summary>
+            Get list of all published posts (any role)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostController.AddComment(Blog.Application.Models.BlogPostAddCommentRequest)">
+            <summary>
+            Add a comment to a published post (any role)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostEditorController.Get">
+            <summary>
+            Get all posts in pending approval status
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostEditorController.GetByStatus(System.Int32)">
+            <summary>
+            Get posts by status. Current options: 
+            PendingApproval = 1,
+            Published = 2,
+            Rejected = 3
+            </summary>
+            <param name="status"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostEditorController.Update(Blog.Application.Models.BlogPostEditorRequest)">
+            <summary>
+            Updates a post to: approved/rejected status.
+            Options to send: 
+            Published = 2,
+            Rejected = 3
+            </summary>
+            <param name="model"></param>
+            <returns></returns>        
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostWriterController.Get">
+            <summary>
+            Get all posts created by the logged in writer
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostWriterController.Add(Blog.Application.Models.BlogPostAddNewRequest)">
+            <summary>
+            Creates a new post (only users with 'Writer' role) with initial state 'Pending Approval'        
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Blog.Web.Api.Controllers.BlogPostWriterController.Update(Blog.Application.Models.BlogPostUpdateRequest)">
+            <summary>
+            Updates a blog post.
+            Posts can not be edited or updated while in pending status, only when rejected.
+            </summary>
+            <param name="model"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

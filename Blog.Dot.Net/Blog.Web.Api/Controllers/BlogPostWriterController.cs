@@ -40,6 +40,10 @@ namespace Blog.Web.Api.Controllers
             _repositoryService = repositoryService;
         }
 
+        /// <summary>
+        /// Get all posts created by the logged in writer
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,7 +88,7 @@ namespace Blog.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<RequestResponse>> Add([FromBody] BlogPostRequest model)
+        public async Task<ActionResult<RequestResponse>> Add([FromBody] BlogPostAddNewRequest model)
         {
             if (ModelState.IsValid)
             {
@@ -159,13 +163,8 @@ namespace Blog.Web.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<RequestResponse>> Update([FromBody] BlogPostRequest model)
+        public async Task<ActionResult<RequestResponse>> Update([FromBody] BlogPostUpdateRequest model)
         {
-            if (model.BlogPostId == 0)
-            {
-                ModelState.AddModelError("BlogPostId", "Blog post id is required");
-            }
-
             if (ModelState.IsValid)
             {
                 try
@@ -181,7 +180,7 @@ namespace Blog.Web.Api.Controllers
                             Message = $"Blog post with id: {model.BlogPostId} not found"
                         });
                     }
-                    
+
                     if (!blogPost.UserId.Equals(currentUser.Id))
                     {
                         return BadRequest(new RequestResponse
