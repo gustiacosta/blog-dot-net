@@ -30,7 +30,7 @@ namespace Blog.Web.Api.Controllers
         private readonly IEntityGenericRepository _repositoryService;
 
         public BlogPostWriterController(ILogger<BlogPostWriterController> logger, IConfiguration config,
-                                    UserManager<ApplicationUser> userManager, IEntityGenericRepository repositoryService, IMapper mapper, IDateTime dateTimeService)
+                                        UserManager<ApplicationUser> userManager, IEntityGenericRepository repositoryService, IMapper mapper, IDateTime dateTimeService)
         {
             _mapper = mapper;
             _logger = logger;

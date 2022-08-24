@@ -3,19 +3,14 @@ using Blog.Application.Mappings;
 using Blog.Infrastructure.Identity;
 using Blog.Infrastructure.Persistence;
 using Blog.Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Blog.Portal
 {
@@ -32,7 +27,7 @@ namespace Blog.Portal
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                    .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -42,9 +37,40 @@ namespace Blog.Portal
 
             services.AddTransient<IEntityGenericRepository, RepositoryService<ApplicationDbContext>>();
 
+            services.AddRazorPages();
+
             services.AddControllersWithViews();
 
-            services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));            
+            services
+              .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+              .AddCookie(options =>
+              {
+                  options.LoginPath = "/identity/account/login";
+                  options.AccessDeniedPath = "/identity/account/denied";                  
+              });
+
+            services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));
+
+            services.AddHttpClient("Default", config =>
+            {
+                config.BaseAddress = new Uri(Configuration["AppSettings:BaseUrl"]);
+                config.Timeout = new TimeSpan(0, 0, 15);
+                config.DefaultRequestHeaders.Clear();
+            });
+
+            services.AddHttpContextAccessor();
+
+            // Configure session state 
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            services.AddScoped<ITokenService, JwtTokenService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -67,7 +93,10 @@ namespace Blog.Portal
             app.UseRouting();
 
             app.UseAuthentication();
+
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

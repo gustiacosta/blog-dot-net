@@ -16,8 +16,8 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.Web.Api.Controllers
-{
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+{    
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Public,Writer,Editor")]
     [ApiController]
     [Route("api/[controller]")]
     public class BlogPostController : ControllerBase
@@ -43,8 +43,7 @@ namespace Blog.Web.Api.Controllers
         /// <summary>
         /// Get list of all published posts (any role)
         /// </summary>
-        /// <returns></returns>
-        [Authorize(Roles = "Public,Writer,Editor")]
+        /// <returns></returns>        
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -81,7 +80,6 @@ namespace Blog.Web.Api.Controllers
         /// Add a comment to a published post (any role)
         /// </summary>
         /// <returns></returns>
-        [Authorize(Roles = "Public,Writer,Editor")]
         [HttpPost]
         [Route("addcomment")]
         [ProducesResponseType(StatusCodes.Status201Created)]

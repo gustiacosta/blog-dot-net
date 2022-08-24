@@ -28,14 +28,14 @@ namespace Blog.Portal.Controllers
 
         public IActionResult Index()
         {
-            var data = _repositoryService
-                .Get<BlogPost>(
-                        c => c.PublishingStatus == (int)Domain.Enums.PostPublishingStatus.Published,
-                        c => c.OrderByDescending(c => c.PublishDate), null, null,
-                        inc => inc.BlogPostComments)
-                .ToList();
+            //var data = _repositoryService
+            //    .Get<BlogPost>(
+            //            c => c.PublishingStatus == (int)Domain.Enums.PostPublishingStatus.Published,
+            //            c => c.OrderByDescending(c => c.PublishDate), null, null,
+            //            inc => inc.BlogPostComments)
+            //    .ToList();
 
-            var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
+            //var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
 
             return View();
         }

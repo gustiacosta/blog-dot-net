@@ -8,7 +8,7 @@
             <summary>
             Get list of all published posts (any role)
             </summary>
-            <returns></returns>
+            <returns></returns>        
         </member>
         <member name="M:Blog.Web.Api.Controllers.BlogPostController.AddComment(Blog.Application.Models.BlogPostAddCommentRequest)">
             <summary>

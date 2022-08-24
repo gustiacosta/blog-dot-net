@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Infrastructure", "Blog
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blog.Portal", "Blog.Portal\Blog.Portal.csproj", "{CAF55F70-FC81-4A7A-976D-0D409E6B85B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blog.Blazor.App", "Blog.Blazor.App\Blog.Blazor.App.csproj", "{6463085F-B422-4DE3-A73A-80B77C4F22F0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,10 +39,6 @@ Global
 		{CAF55F70-FC81-4A7A-976D-0D409E6B85B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAF55F70-FC81-4A7A-976D-0D409E6B85B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAF55F70-FC81-4A7A-976D-0D409E6B85B7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6463085F-B422-4DE3-A73A-80B77C4F22F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6463085F-B422-4DE3-A73A-80B77C4F22F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6463085F-B422-4DE3-A73A-80B77C4F22F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6463085F-B422-4DE3-A73A-80B77C4F22F0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,14 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Blog posts home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="card">
+    <div class="card-body">
+
+        <h5 class="card-title">@ViewData["Title"]</h5>
+        <div id="gridContainer"></div>
+        <div id="toast"></div>
+    </div>
 </div>
+
+<script src="~/js/blogpost/blogpost.js?version=1"></script>

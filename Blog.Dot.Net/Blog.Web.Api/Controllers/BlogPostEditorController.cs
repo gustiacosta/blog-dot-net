@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Blog.Web.Api.Controllers
 {
-    [Authorize(Roles = "Editor")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Editor")]
     [ApiController]
     [Route("api/[controller]")]
     public class BlogPostEditorController : ControllerBase

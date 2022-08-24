@@ -68,7 +68,7 @@ namespace Blog.Web.Api.Controllers
                     {
                         var jwtTokenInfo = _tokenService.BuildToken(_config["Jwt:Key"], _config["Jwt:Issuer"], _config["Jwt:Audience"], model.UserName, userRoles.ToList());
 
-                        return Ok(new
+                        return Ok(new LoginResponse
                         {
                             IsSuccess = true,
                             UserName = model.UserName,
