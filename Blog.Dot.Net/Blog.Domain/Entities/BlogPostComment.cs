@@ -9,6 +9,7 @@ namespace Blog.Domain.Entities
         public int BlogPostId { get; set; }
         public DateTime Date { get; set; }
         public string Comment { get; set; }
+        public virtual User User { get; set; }
         public virtual BlogPost BlogPost { get; set; }
     }
 }

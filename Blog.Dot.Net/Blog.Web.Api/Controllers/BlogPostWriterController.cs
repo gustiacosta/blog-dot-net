@@ -61,10 +61,15 @@ namespace Blog.Web.Api.Controllers
 
                 var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
 
+                foreach (var post in posts)
+                {
+                    post.UserName = $"{currentUser.LastName}, {currentUser.Name}";
+                }
+
                 return Ok(new RequestResponse
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
+                    Data = posts
                 });
             }
             catch (Exception ex)
@@ -82,8 +87,7 @@ namespace Blog.Web.Api.Controllers
         /// Creates a new post (only users with 'Writer' role) with initial state 'Pending Approval'        
         /// </summary>
         /// <param name="model"></param>
-        /// <returns></returns>
-        //[Authorize(Roles = "Writer")]
+        /// <returns></returns>        
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

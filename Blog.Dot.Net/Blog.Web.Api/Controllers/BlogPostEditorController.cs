@@ -59,11 +59,15 @@ namespace Blog.Web.Api.Controllers
                             c => c.OrderByDescending(c => c.CreateDate));
 
                 var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
+                foreach (var post in posts)
+                {
+                    post.UserName = $"{currentUser.LastName}, {currentUser.Name}";
+                }
 
                 return Ok(new RequestResponse
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
+                    Data = posts
                 });
             }
             catch (Exception ex)
@@ -94,17 +98,25 @@ namespace Blog.Web.Api.Controllers
         {
             try
             {
+                var currentUser = await _userManager.FindByEmailAsync(HttpContext.User.Identity.Name);
+
                 var data = await _repositoryService.GetAsync<BlogPost>(
-                            c => c.PublishingStatus == status,
+                            c => c.UserId.Equals(currentUser.Id) &&
+                            c.PublishingStatus == status,
                             c => c.OrderByDescending(c => c.CreateDate),
                             null, null, inc => inc.BlogPostComments);
 
                 var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
 
+                foreach (var post in posts)
+                {
+                    post.UserName = $"{currentUser.LastName}, {currentUser.Name}";
+                }
+
                 return Ok(new RequestResponse
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
+                    Data = posts
                 });
             }
             catch (Exception ex)

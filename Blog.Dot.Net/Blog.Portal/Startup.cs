@@ -6,6 +6,8 @@ using Blog.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,28 +28,40 @@ namespace Blog.Portal
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //services
+            //    .AddDbContext<UserIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services
-                    .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+               .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), sqlServerOptionsAction: options =>
+               {
+                   options.EnableRetryOnFailure(
+                       maxRetryCount: 5,
+                       maxRetryDelay: TimeSpan.FromSeconds(5),
+                       errorNumbersToAdd: null);
+               }));
+
+            //services
+            //    .AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+            //    .AddEntityFrameworkStores<UserIdentityDbContext>();
+
+            services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/identity/account/login";
+                    options.AccessDeniedPath = "/identity/account/denied";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                });
+
+            services.AddHttpContextAccessor();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services
-                .AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false) //updated from IdentityUser
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddTransient<IEntityGenericRepository, RepositoryService<ApplicationDbContext>>();
 
             services.AddRazorPages();
 
             services.AddControllersWithViews();
-
-            services
-              .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-              .AddCookie(options =>
-              {
-                  options.LoginPath = "/identity/account/login";
-                  options.AccessDeniedPath = "/identity/account/denied";                  
-              });
 
             services.AddAutoMapper(options => options.AddProfile(new AutoMapperConfiguration()));
 
@@ -88,6 +102,7 @@ namespace Blog.Portal
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -95,6 +110,11 @@ namespace Blog.Portal
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Strict
+            });
 
             app.UseSession();
 

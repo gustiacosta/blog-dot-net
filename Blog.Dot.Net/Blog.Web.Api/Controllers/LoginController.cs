@@ -71,7 +71,9 @@ namespace Blog.Web.Api.Controllers
                         return Ok(new LoginResponse
                         {
                             IsSuccess = true,
-                            UserName = model.UserName,
+                            UserName = existingUser.Name,
+                            UserId = existingUser.Id,
+                            UserEmail = existingUser.Email,
                             AccessToken = jwtTokenInfo.AccessToken,
                             Expires = jwtTokenInfo.Expires,
                             UserRoles = userRoles.ToList()

@@ -1,0 +1,41 @@
+﻿@model Blog.Application.Models.BlogPostDto
+
+<!-- Page Header-->
+<header class="masthead" style="height:200px; padding-top:80px;">
+    <div class="container position-relative px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-12 col-lg-8 col-xl-7">
+                <div class="post-heading">
+                    <h1>@Model.Title</h1>
+                    @*<h2 class="subheading">Problems look mighty small from 150 miles up</h2>*@
+                    <span class="meta">
+                        Posted by
+                        <a href="#!">@Model.UserName</a>
+                        on @Model.PublishDate.Value.ToString("MMM dd yyyy") | @Model.CommentsCount comments
+                    </span>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content-->
+<article class="mb-4">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                
+                @Html.Raw(Model.Content)
+
+                @*<p>
+                    Placeholder text by
+                    <a href="http://spaceipsum.com/">Space Ipsum</a>
+                    &middot; Images by
+                    <a href="https://www.flickr.com/photos/nasacommons/">NASA on The Commons</a>
+                </p>*@
+            </div>
+        </div>
+    </div>
+</article>
+
+<a href="@Url.Action("Index", "Home")">Back to list</a>

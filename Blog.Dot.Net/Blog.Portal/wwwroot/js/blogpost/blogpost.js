@@ -5,7 +5,6 @@
     var gridDataSource = new DevExpress.data.CustomStore({
         key: "id",
         load: async function () {
-
          return await fetch("api/session")
                 .then((resp) => resp.json())
                 .then(async function (data) {
@@ -102,7 +101,14 @@
                             colCount: 1,
                             colSpan: 2,
                             items: [                                
-                                { dataField: "content" },
+                                {
+                                    dataField: "content",
+                                    editorType: 'dxTextArea',
+                                    colspan: 2,
+                                    editorOptions: {
+                                        height: 250,
+                                    },
+                                },
                             ],
                         },
                     ],
@@ -125,7 +131,6 @@
                 caption: "Author",
                 dataField: 'userName',
                 dataType: 'string',
-                //validationRules: [{ type: "required" }]
             },
             {
                 caption: "Title",

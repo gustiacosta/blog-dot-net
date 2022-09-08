@@ -1,23 +1,24 @@
 ﻿using Blog.Domain.Entities;
-using Blog.Infrastructure.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Blog.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : DbContext
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<BlogPost> BlogPosts { get; set; }
-        public DbSet<BlogPostComment> BlogPostComments { get; set; }
+        public virtual DbSet<User> User { get; set; }
+        public virtual DbSet<BlogPost> BlogPosts { get; set; }
+        public virtual DbSet<BlogPostComment> BlogPostComments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
+
+            builder.Entity<User>().ToTable("AspNetUsers");
 
             builder.Entity<BlogPost>().ToTable("BlogPost");
 

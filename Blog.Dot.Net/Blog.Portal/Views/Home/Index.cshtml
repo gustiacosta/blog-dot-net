@@ -1,14 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Blog posts home page";
+﻿@model List<Blog.Application.Models.BlogPostDto>
+
+@{
+    ViewData["Title"] = "Blog Posts Home Page";
 }
 
-<div class="card">
-    <div class="card-body">
+<div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="col-md-10 col-lg-8 col-xl-7">
 
-        <h5 class="card-title">@ViewData["Title"]</h5>
-        <div id="gridContainer"></div>
-        <div id="toast"></div>
+            @foreach (var item in Model)
+            {
+                var subTitle = @item.Content.Substring(0, 100);
+                subTitle = subTitle.Substring(0, subTitle.LastIndexOf(" "));
+
+                <div class="post-preview">
+                    <a href="@Url.Action("View", "Blog", new {id = @item.Id})">
+                        <h2 class="post-title">@item.Title</h2>
+                        <h3 class="post-subtitle">@subTitle...</h3>
+                    </a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#!">@item.UserName</a>
+                        on @item.PublishDate.Value.ToString("MMM dd yyyy")
+                    </p>
+                </div>
+
+                if (Model.Count > 1)
+                {
+                    <text>
+                        <hr class="my-4" />
+                    </text>
+                }
+            }
+
+        </div>
     </div>
 </div>
 
-<script src="~/js/blogpost/blogpost.js?version=1"></script>
+<!-- Pagination-->
+<nav aria-label="Pagination">
+    <hr class="my-0" />
+    <ul class="pagination justify-content-center my-4">
+        <li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true">Newer</a></li>
+        <li class="page-item active" aria-current="page"><a class="page-link" href="#!">1</a></li>
+        <li class="page-item"><a class="page-link" href="#!">2</a></li>
+        <li class="page-item"><a class="page-link" href="#!">3</a></li>
+        <li class="page-item disabled"><a class="page-link" href="#!">...</a></li>
+        <li class="page-item"><a class="page-link" href="#!">15</a></li>
+        <li class="page-item"><a class="page-link" href="#!">Older</a></li>
+    </ul>
+</nav>

@@ -15,7 +15,7 @@ namespace Blog.Portal.Controllers
         {
             return Ok(new
             {
-                token = HttpContext.Session.GetString("Token")
+                token = HttpContext.Session?.GetString("Token")
             });
         }
     }

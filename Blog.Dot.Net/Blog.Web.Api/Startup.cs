@@ -1,6 +1,7 @@
 using Blog.Application.Interfaces;
 using Blog.Application.Mappings;
 using Blog.Infrastructure.Identity;
+using Blog.Infrastructure.Middleware;
 using Blog.Infrastructure.Persistence;
 using Blog.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -34,12 +35,21 @@ namespace Blog.Web.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services
-                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), sqlServerOptionsAction: options =>
+                {
+                    options.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(5),
+                        errorNumbersToAdd: null);
+                }));
 
             services
-                .AddIdentityCore<ApplicationUser>()
+                .AddDbContext<UserIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services
+                .AddIdentityCore<ApplicationUser>(options=> options.SignIn.RequireConfirmedAccount = false)
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<UserIdentityDbContext>();
 
             services.AddTransient<IEntityGenericRepository, RepositoryService<ApplicationDbContext>>();
 
@@ -134,6 +144,8 @@ namespace Blog.Web.Api
             }
 
             app.UseHttpsRedirection();
+
+            app.UseAntiXssMiddleware();
 
             app.UseRouting();
 

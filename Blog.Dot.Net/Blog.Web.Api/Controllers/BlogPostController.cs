@@ -16,8 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace Blog.Web.Api.Controllers
-{    
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Public,Writer,Editor")]
+{
     [ApiController]
     [Route("api/[controller]")]
     public class BlogPostController : ControllerBase
@@ -55,14 +54,46 @@ namespace Blog.Web.Api.Controllers
                 var data = await _repositoryService.GetAsync<BlogPost>(
                             c => c.PublishingStatus == (int)Domain.Enums.PostPublishingStatus.Published,
                             c => c.OrderByDescending(c => c.PublishDate),
-                            null, null, inc => inc.BlogPostComments);
+                            null, null, inc => inc.User, inc => inc.BlogPostComments);
 
                 var posts = _mapper.Map<IEnumerable<BlogPostDto>>(data);
 
                 return Ok(new RequestResponse
                 {
                     IsSuccess = true,
-                    Data = _mapper.Map<IEnumerable<BlogPostDto>>(data)
+                    Data = posts
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
+
+            return BadRequest(new RequestResponse
+            {
+                Message = "Error retrieving blog posts"
+            });
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult<RequestResponse>> Get(int id)
+        {
+            try
+            {
+                var data = await _repositoryService
+                    .GetFirstAsync<BlogPost>(c => c.Id == id, null, null, null,
+                    inc => inc.User, inc => inc.BlogPostComments);
+
+                var post = _mapper.Map<BlogPostDto>(data);
+
+                return Ok(new RequestResponse
+                {
+                    IsSuccess = true,
+                    Data = post
                 });
             }
             catch (Exception ex)
@@ -80,6 +111,7 @@ namespace Blog.Web.Api.Controllers
         /// Add a comment to a published post (any role)
         /// </summary>
         /// <returns></returns>
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Public,Writer,Editor")]
         [HttpPost]
         [Route("addcomment")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -91,7 +123,7 @@ namespace Blog.Web.Api.Controllers
             {
                 try
                 {
-                    var currentUser = await _userManager.FindByEmailAsync(HttpContext.User.Identity.Name); //User.Identity.Name);
+                    var currentUser = await _userManager.FindByEmailAsync(HttpContext.User.Identity.Name);
 
                     var blogPost = await _repositoryService.GetFirstAsync<BlogPost>(c => c.Id == model.BlogPostId);
 
@@ -113,8 +145,8 @@ namespace Blog.Web.Api.Controllers
 
                     _repositoryService.Create(new BlogPostComment
                     {
-                        UserId = currentUser.Id,
                         Comment = model.Comment,
+                        UserId = currentUser.Id,
                         BlogPostId = model.BlogPostId,
                         Date = _dateTimeService.UtcNow()
                     });

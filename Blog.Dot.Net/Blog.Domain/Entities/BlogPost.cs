@@ -20,6 +20,7 @@ namespace Blog.Domain.Entities
         public int PublishingStatus { get; set; }
         public string RejectComment { get; set; }
 
+        public virtual User User { get; set; }
         public virtual IEnumerable<BlogPostComment> BlogPostComments { get; set; }
     }
 }
